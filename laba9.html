@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ЛР №9 – Маніпулювання стилями CSS</title>
+<style>
+  body {
+    font-family: "Segoe UI", sans-serif;
+    text-align: center;
+    background: linear-gradient(135deg, #b2fefa, #0ed2f7);
+    padding: 20px;
+    transition: background 0.5s ease;
+  }
+  h1 { color: #222; margin-bottom: 10px; }
+  #round { font-size: 18px; margin-bottom: 20px; }
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+  }
+  .player { text-align: center; }
+  .score {
+    background: #0099ff;
+    color: white;
+    border-radius: 10px;
+    padding: 6px 20px;
+    font-weight: bold;
+    display: inline-block;
+    font-size: 20px;
+    margin-bottom: 15px;
+    transition: background 0.3s, transform 0.3s;
+  }
+  .card {
+    width: 140px;
+    height: 210px;
+    border: 3px solid #333;
+    border-radius: 15px;
+    background: white;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    font-weight: bold;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    transition: all 0.4s ease;
+  }
+  .corner {
+    position: absolute;
+    font-size: 22px;
+    font-weight: normal;
+  }
+  .corner.top { top: 8px; left: 10px; }
+  .corner.bottom { bottom: 8px; right: 10px; transform: rotate(180deg); }
+  button {
+    background: limegreen;
+    color: white;
+    font-size: 24px;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 35px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  button:hover {
+    background: green;
+  }
+  #result {
+    margin-top: 25px;
+    font-size: 26px;
+    font-weight: bold;
+  }
+  @media (max-width: 700px) {
+    .container { flex-direction: column; gap: 30px; }
+    .card { width: 110px; height: 160px; font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+<h1>Гра: Користувач проти Комп’ютера</h1>
+<p id="round">Спроба 1 з 3</p>
+<div class="container">
+  <div class="player">
+    <div class="score" id="userScore">0</div>
+    <div id="userCard" class="card">?</div>
+  </div>
+  <button id="generate">Generate</button>
+  <div class="player">
+    <div class="score" id="compScore">0</div>
+    <div id="compCard" class="card">?</div>
+  </div>
+</div>
+
+<h2 id="result"></h2>
+
+<script>
+  const cards = [
+    {name: '6', value: 6}, {name: '7', value: 7},
+    {name: '8', value: 8}, {name: '9', value: 9},
+    {name: '10', value: 10}, {name: 'В', value: 2},
+    {name: 'Д', value: 3}, {name: 'К', value: 4},
+    {name: 'Т', value: 11}
+  ];
+  const suits = ['♠', '♥', '♦', '♣'];
+
+  let userScore = 0, compScore = 0, round = 1;
+  const userCard = document.getElementById('userCard');
+  const compCard = document.getElementById('compCard');
+  const userScoreEl = document.getElementById('userScore');
+  const compScoreEl = document.getElementById('compScore');
+  const resultEl = document.getElementById('result');
+  const roundEl = document.getElementById('round');
+  const btn = document.getElementById('generate');
+  const body = document.body;
+
+  const userName = prompt("Введіть ваше ім’я:") || "Гравець";
+
+  function randomCard() {
+    const card = cards[Math.floor(Math.random() * cards.length)];
+    const suit = suits[Math.floor(Math.random() * suits.length)];
+    const color = (suit === '♥' || suit === '♦') ? 'red' : 'black';
+    return { ...card, suit, color };
+  }
+
+  function showCard(element, card) {
+    element.style.color = card.color;
+    element.style.borderColor = card.color === 'red' ? '#d22' : '#111';
+    element.style.boxShadow = `0 0 20px ${card.color}`;
+    element.innerHTML = `
+      <div class="corner top">${card.name}${card.suit}</div>
+      <div>${card.suit}</div>
+      <div class="corner bottom">${card.name}${card.suit}</div>
+    `;
+  }
+
+  function generateCards() {
+    if (round > 3) return;
+
+    // Динамическое изменение фона страницы
+    const hue = Math.floor(Math.random() * 360);
+    body.style.background = `linear-gradient(135deg, hsl(${hue}, 80%, 80%), hsl(${hue+60}, 90%, 50%))`;
+
+    const user = randomCard();
+    const comp = randomCard();
+
+    showCard(userCard, user);
+    showCard(compCard, comp);
+
+    userScore += user.value;
+    compScore += comp.value;
+
+    userScoreEl.textContent = userScore;
+    compScoreEl.textContent = compScore;
+
+    // Маніпулювання стилями через JS:
+    userScoreEl.style.background = userScore > compScore ? '#00cc66' : '#0099ff';
+    compScoreEl.style.background = compScore > userScore ? '#cc0000' : '#0099ff';
+
+    roundEl.textContent = `Спроба ${round} з 3`;
+
+    if (round === 3) {
+      btn.disabled = true;
+      btn.style.background = "#999";
+      btn.style.cursor = "default";
+      if (userScore > compScore) resultEl.textContent = `${userName} виграв! 🎉`;
+      else if (userScore < compScore) resultEl.textContent = `Комп’ютер виграв 😢`;
+      else resultEl.textContent = `Нічия! 🤝`;
+    }
+
+    round++;
+  }
+
+  btn.addEventListener('click', generateCards);
+</script>
+</body>
+</html>
