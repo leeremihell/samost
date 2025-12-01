@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Однорукий бандит</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(120deg, #a1c4fd, #c2e9fb);
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      width: 320px;
+      max-width: 90%;
+    }
+
+    #generateBtn {
+      background-color: #00ff00;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    #generateBtn:hover {
+      background-color: #00cc00;
+    }
+
+    .slot-machine {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      margin-top: 15px;
+    }
+
+    .slot {
+      background-color: #6c7aef;
+      border-radius: 10px;
+      padding: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.3s;
+    }
+
+    /* Середній ряд має інший фон */
+    .slot.middle {
+      background-color: #fff9a5;
+    }
+
+    .slot svg {
+      width: 80px;
+      height: 80px;
+    }
+
+    @media (max-width: 500px) {
+      .slot svg {
+        width: 60px;
+        height: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="userName"></h2>
+    <p id="attemptInfo"></p>
+    <button id="generateBtn">Generate</button>
+
+    <div class="slot-machine" id="slotMachine"></div>
+
+    <p id="result"></p>
+  </div>
+
+  <script>
+    const fruits = ["apple", "pear", "lemon", "cherry"];
+    const maxAttempts = 3;
+    let attempts = 0;
+    let userName = prompt("Введіть ваше ім’я:") || "User";
+
+    const nameField = document.getElementById("userName");
+    const attemptInfo = document.getElementById("attemptInfo");
+    const generateBtn = document.getElementById("generateBtn");
+    const slotMachine = document.getElementById("slotMachine");
+    const result = document.getElementById("result");
+
+    nameField.textContent = userName;
+    updateAttempts();
+
+    // SVG-фрукти (спрощений набір)
+    const fruitSVG = {
+      lemon: `<svg viewBox="0 0 100 100">
+                <ellipse cx="50" cy="50" rx="40" ry="30" fill="#f9e65c" stroke="#a68b00" stroke-width="2"/>
+                <ellipse cx="50" cy="35" rx="10" ry="6" fill="#fff" opacity="0.35"/>
+              </svg>`,
+      apple: `<svg viewBox="0 0 100 100">
+                <circle cx="50" cy="55" r="30" fill="#e43" stroke="#900" stroke-width="2"/>
+                <rect x="48" y="15" width="4" height="15" fill="#603"/>
+                <path d="M52 15 C60 10 70 20 60 25 Z" fill="#3a3"/>
+              </svg>`,
+      cherry: `<svg viewBox="0 0 100 100">
+                 <circle cx="40" cy="70" r="15" fill="#d11" stroke="#700" stroke-width="2"/>
+                 <circle cx="60" cy="70" r="15" fill="#d11" stroke="#700" stroke-width="2"/>
+                 <path d="M40 55 C50 30 70 30 60 55" stroke="#653" stroke-width="3" fill="none"/>
+               </svg>`,
+      pear: `<svg viewBox="0 0 100 100">
+               <path d="M50,25 C40,25 38,38 42,45 C26,56 28,85 50,85 C72,85 74,56 58,45 C62,38 60,25 50,25 Z"
+                     fill="#dd4" stroke="#8c6b00" stroke-width="2"/>
+               <rect x="48" y="15" width="4" height="10" fill="#653"/>
+               <path d="M52 15 C60 10 70 25 60 30 Z" fill="#3a3"/>
+             </svg>`
+    };
+
+    // --- Основні події ---
+    generateBtn.addEventListener("click", () => generateSlots(false)); // звичайне обертання
+    window.addEventListener("load", () => generateSlots(true)); // перше відображення без спроби
+
+    // --- Функції ---
+    function generateSlots(isInitial = false) {
+      // якщо це не початковий показ — додаємо спробу
+      if (!isInitial) {
+        attempts++;
+        updateAttempts();
+      }
+
+      slotMachine.innerHTML = "";
+
+      // створюємо матрицю 3x3 з фруктів
+      let matrix = [];
+      for (let i = 0; i < 3; i++) {
+        let column = shuffle([...fruits]).slice(0, 3);
+        matrix.push(column);
+      }
+
+      // малюємо поле
+      for (let row = 0; row < 3; row++) {
+        for (let col = 0; col < 3; col++) {
+          const slot = document.createElement("div");
+          slot.classList.add("slot");
+          if (row === 1) slot.classList.add("middle");
+          slot.innerHTML = fruitSVG[matrix[col][row]];
+          slotMachine.appendChild(slot);
+        }
+      }
+
+      // перевірка виграшу тільки після кліку
+      if (!isInitial) {
+        const middleRow = 1;
+        const win =
+          matrix[0][middleRow] === matrix[1][middleRow] &&
+          matrix[1][middleRow] === matrix[2][middleRow];
+
+        if (win) {
+          result.textContent = `Вітаємо, ${userName}! Ви виграли!`;
+          generateBtn.disabled = true;
+        } else if (attempts >= maxAttempts) {
+          result.textContent = "Ви програли. Спробуйте ще раз!";
+          generateBtn.disabled = true;
+        } else {
+          result.textContent = "";
+        }
+      }
+    }
+
+    function updateAttempts() {
+      attemptInfo.textContent = `Спроба ${attempts} з ${maxAttempts}`;
+    }
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+  </script>
+</body>
+</html>
