@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Магічна куля</title>
+</head>
+<body>
+  <script>
+    const style = document.createElement('style');
+    style.textContent = `
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #001f3f, #004d40, #1a237e);
+        color: white;
+      }
+
+      input {
+        background-color: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 20px;
+        padding: 10px 20px;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        text-align: center;
+        color: white;
+        width: 300px;
+        outline: none;
+      }
+
+      input::placeholder {
+        color: rgba(255,255,255,0.6);
+      }
+
+      .ball {
+        position: relative;
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #3f51b5, #1a237e, #000);
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+
+      .ball:hover {
+        transform: scale(1.05);
+      }
+
+      .ball::before {
+        content: "";
+        position: absolute;
+        width: 90%;
+        height: 90%;
+        border-radius: 50%;
+        background: radial-gradient(circle at center, rgba(255,255,255,0.1), transparent);
+        animation: pulse 4s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+      }
+
+      @media (max-width: 600px) {
+        .ball {
+          width: 180px;
+          height: 180px;
+          font-size: 1.2rem;
+        }
+        input {
+          font-size: 1rem;
+          width: 90%;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Введи своє питання...';
+
+    const ball = document.createElement('div');
+    ball.className = 'ball';
+    ball.textContent = '...';
+
+    document.body.append(input, ball);
+
+    const answers = [
+      'Так',
+      'Можливо',
+      'Звичайно',
+      'Ні',
+      'Певно',
+      'Спробуй ще раз',
+      'Без сумнівів'
+    ];
+
+    ball.addEventListener('click', () => {
+      const question = input.value.trim();
+      if (!question) {
+        ball.textContent = 'Введи питання!';
+        return;
+      }
+      const randomIndex = Math.floor(Math.random() * answers.length);
+      const answer = answers[randomIndex];
+      ball.textContent = answer;
+      ball.style.transform = 'scale(0.9)';
+      setTimeout(() => ball.style.transform = 'scale(1)', 200);
+    });
+  </script>
+</body>
+</html>
