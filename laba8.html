@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Гра: Хто більше?</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .player {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .name-box {
+      background: #00b4ff;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+    .score {
+      font-size: 20px;
+      margin-top: 5px;
+      color: black;
+    }
+    .number {
+      background: yellow;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 30px;
+      font-weight: bold;
+      border: 3px solid black;
+      margin-top: 10px;
+    }
+    .generate-btn {
+      background: limegreen;
+      color: black;
+      font-size: 20px;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .generate-btn:hover {
+      background: #33cc33;
+    }
+    .result {
+      margin-top: 30px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    @media (max-width: 600px) {
+      .container {
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Гра: Хто більше?</h1>
+  <div class="container">
+    <div class="player" id="user">
+      <div class="name-box" id="userName">User</div>
+      <div class="score" id="userScore">0</div>
+      <div class="number" id="userNum">-</div>
+    </div>
+    
+    <button class="generate-btn" id="generateBtn">Generate</button>
+    
+    <div class="player" id="computer">
+      <div class="name-box">Computer</div>
+      <div class="score" id="compScore">0</div>
+      <div class="number" id="compNum">-</div>
+    </div>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    // --- Prompt for user name ---
+    let userName = prompt("Введіть своє ім'я:");
+    while (!userName || userName.trim() === "") {
+      userName = prompt("Будь ласка, введіть коректне ім’я!");
+    }
+    document.getElementById("userName").textContent = userName.trim();
+
+    // --- Game variables ---
+    let userScore = 0;
+    let compScore = 0;
+
+    const userNum = document.getElementById("userNum");
+    const compNum = document.getElementById("compNum");
+    const userScoreEl = document.getElementById("userScore");
+    const compScoreEl = document.getElementById("compScore");
+    const resultEl = document.getElementById("result");
+    const generateBtn = document.getElementById("generateBtn");
+
+    // --- Function instead of lambda ---
+    function generateNumbers() {
+      if (userScore >= 3 || compScore >= 3) return;
+
+      const userRandom = Math.floor(Math.random() * 10) + 1;
+      const compRandom = Math.floor(Math.random() * 10) + 1;
+
+      userNum.textContent = userRandom;
+      compNum.textContent = compRandom;
+
+      if (userRandom > compRandom) {
+        userScore++;
+      } else if (compRandom > userRandom) {
+        compScore++;
+      }
+
+      userScoreEl.textContent = userScore;
+      compScoreEl.textContent = compScore;
+
+      if (userScore === 3) {
+        resultEl.textContent = `${userName} переміг!`;
+        generateBtn.disabled = true;
+        generateBtn.style.background = "gray";
+      } else if (compScore === 3) {
+        resultEl.textContent = "Комп’ютер переміг!";
+        generateBtn.disabled = true;
+        generateBtn.style.background = "gray";
+      }
+    }
+
+    // --- Event listener ---
+    generateBtn.addEventListener("click", generateNumbers);
+  </script>
+</body>
+</html>
