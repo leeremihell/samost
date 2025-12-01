@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Games</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background: radial-gradient(circle at top, #3b82f6 0, #111827 45%, #020617 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #f9fafb;
+    }
+
+    .games-card {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 1.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      max-width: 800px;
+      width: 100%;
+      padding: 1.5rem;
+    }
+
+    .games-title {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+
+    .games-main-title {
+      font-weight: 700;
+    }
+
+    #carouselWrapper {
+      max-width: 480px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .carousel-viewport {
+      overflow: hidden;
+      border-radius: 1rem;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: radial-gradient(circle at top, #1d4ed8 0, #020617 55%);
+    }
+
+    .carousel-inner-custom {
+      position: relative;
+      width: 100%;
+      height: 320px; 
+    }
+
+    .carousel-item-custom {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+      /* Prevent invisible slides from being clickable */
+      pointer-events: none;
+    }
+
+    .carousel-item-custom.active {
+      opacity: 1;
+      pointer-events: auto; /* allow clicks on the visible slide */
+      z-index: 2; /* ensure the active slide sits on top */
+    }
+
+    .carousel-item-custom a {
+      color: #e5e7eb;
+      text-decoration: none;
+    }
+
+    .carousel-item-custom a:hover h2 {
+      color: #60a5fa;
+    }
+
+    .carousel-item-custom img {
+      max-width: 260px;
+      border-radius: 1rem;
+      margin-top: 0.5rem;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Стрелки – всегда на одном месте */
+    .carousel-control-custom {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background-color: rgba(15, 23, 42, 0.85);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+      z-index: 5;
+    }
+
+    .carousel-control-custom svg {
+      width: 18px;
+      height: 18px;
+      fill: #e5e7eb;
+    }
+
+    .carousel-control-prev-custom {
+      left: -22px;
+    }
+
+    .carousel-control-next-custom {
+      right: -22px;
+    }
+
+    .carousel-control-custom:hover {
+      background-color: rgba(37, 99, 235, 0.95);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.6);
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    @media (max-width: 576px) {
+      .carousel-control-prev-custom {
+        left: -10px;
+      }
+      .carousel-control-next-custom {
+        right: -10px;
+      }
+      .carousel-inner-custom {
+        height: 280px;
+      }
+    }
+
+    /* Тумбнейлы */
+    .thumbs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+
+    .thumb {
+      width: 72px;
+      height: 72px;
+      border-radius: 0.9rem;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      opacity: 0.7;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb.active-thumb {
+      border-color: #3b82f6;
+      opacity: 1;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.8);
+      transform: translateY(-4px);
+    }
+
+    .thumb:hover {
+      opacity: 1;
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .thumb-label {
+      position: absolute;
+      bottom: 2px;
+      left: 4px;
+      right: 4px;
+      font-size: 0.6rem;
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.9), transparent);
+      color: #e5e7eb;
+      text-align: center;
+      padding: 2px 4px;
+      border-radius: 0.5rem;
+    }
+
+    #lucky {
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding-inline: 1.5rem;
+      box-shadow: 0 10px 25px rgba(249, 115, 22, 0.7);
+    }
+
+    #lucky.spinning {
+      opacity: 0.8;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="games-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <div class="games-title">Dashboard</div>
+        <h2 class="games-main-title mb-0">My Games</h2>
+      </div>
+      <button id="lucky" class="btn btn-warning btn-sm">
+        I'm Lucky
+      </button>
+    </div>
+
+    <div id="carouselWrapper">
+      <div class="carousel-viewport">
+        <div class="carousel-inner-custom" id="carousel-inner"></div>
+      </div>
+
+
+      <button class="carousel-control-custom carousel-control-prev-custom" id="prevBtn" aria-label="Previous">
+        <svg viewBox="0 0 16 16">
+          <path d="M10.5 2.5L5 8l5.5 5.5-1.4 1.4L2.2 8l6.9-6.9z"></path>
+        </svg>
+      </button>
+
+      <button class="carousel-control-custom carousel-control-next-custom" id="nextBtn" aria-label="Next">
+        <svg viewBox="0 0 16 16">
+          <path d="M5.5 13.5L11 8 5.5 2.5 6.9 1.1 13.8 8l-6.9 6.9z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Тумбнейлы -->
+    <div class="thumbs" id="thumbs"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+const games = [
+  { name: "Game 7", file: "laba7.html", img: "laba7.jpg" },
+  { name: "Game 8", file: "laba8.html", img: "laba8.jpg" },
+  { name: "Game 9", file: "laba9.html", img: "laba9.jpg" },
+  { name: "Game 10", file: "laba10.html", img: "laba10.jpg" }
+];
+
+const carouselInner = document.getElementById("carousel-inner");
+const thumbsContainer = document.getElementById("thumbs");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const luckyBtn = document.getElementById("lucky");
+
+let currentIndex = 0;
+let items = [];
+let thumbs = [];
+let spinning = false;
+
+// Создание элементов карусели и тумбнейлов
+games.forEach((g, i) => {
+  const item = document.createElement("div");
+  item.className = "carousel-item-custom" + (i === 0 ? " active" : "");
+  item.innerHTML = `
+	<a href="${g.file}">
+	  <img src="${g.img}" alt="${g.name}">
+	</a>
+  `;
+  items.push(item);
+  carouselInner.appendChild(item);
+
+  const thumb = document.createElement("div");
+  thumb.className = "thumb" + (i === 0 ? " active-thumb" : "");
+  thumb.innerHTML = `
+    <img src="${g.img}">
+    <div class="thumb-label">${g.name}</div>
+  `;
+  thumb.addEventListener("click", () => {
+    if (!spinning) {
+      currentIndex = i;
+      updateActive();
+    }
+  });
+  thumbs.push(thumb);
+  thumbsContainer.appendChild(thumb);
+});
+
+function updateActive() {
+  items.forEach((item, idx) => {
+    item.classList.toggle("active", idx === currentIndex);
+  });
+  thumbs.forEach((thumb, idx) => {
+    thumb.classList.toggle("active-thumb", idx === currentIndex);
+  });
+}
+
+function showNext() {
+  currentIndex = (currentIndex + 1) % games.length;
+  updateActive();
+}
+
+function showPrev() {
+  currentIndex = (currentIndex - 1 + games.length) % games.length;
+  updateActive();
+}
+
+prevBtn.addEventListener("click", () => {
+  if (!spinning) showPrev();
+});
+
+nextBtn.addEventListener("click", () => {
+  if (!spinning) showNext();
+});
+
+// Lucky spin
+luckyBtn.addEventListener("click", () => {
+  if (spinning) return;
+  spinning = true;
+  luckyBtn.classList.add("spinning");
+
+  let totalSteps = Math.floor(Math.random() * 10) + 10; 
+  let step = 0;
+
+  function spin() {
+    showNext();
+    step++;
+
+    if (step < totalSteps) {
+      setTimeout(spin, 25 + Math.random() * 115);
+    } else {
+      spinning = false;
+      luckyBtn.classList.remove("spinning");
+    }
+  }
+
+  spin();
+});
+</script>
